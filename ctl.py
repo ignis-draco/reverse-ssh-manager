@@ -56,9 +56,25 @@ NodeList = []
 
 fileList = glob.glob(PATH + "/*.conf")
 
-print(fileList)
 for i in fileList:
     NodeList.append(readConfig(i))    
+
+systemd = """
+
+[Unit]
+Description=autossh
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=autossh
+ExecStart=/usr/bin/autossh -M 0 -q -i $keyfile -N -R $port: 127.0.0.1:22 $user@home.hueff.de -p <port>
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+""" 
 
 
 ## functions 
