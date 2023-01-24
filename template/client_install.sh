@@ -22,6 +22,15 @@ sudo apt-get install autossh
 
 ##0) check if alle Files are pressend
 
+if test -f "$name"; then 
+	echo "key file not pressend"
+	return -1
+fi 
+
+if test -f "known_hosts"; then 
+	echo "known_hosts file not pressend"
+	return -1
+fi 
 
 
 ##1) Create user 
@@ -53,6 +62,3 @@ sudo systemctl enable autossh_$name.service
 
 
 
-#if test -f ""; then 
-#	echo "systemd unit file not pressend"
-#fi 
