@@ -106,7 +106,9 @@ def create(globel):
         return
     
     cmd = ["sudo useradd --no-create-home -g remoteNodes -s /sbin/nologin --system $name",
-    """ sudo -u $name bash -c "ssh-keygen -t ecdsa -b 256 -f /etc/ssh/authorized-keys/$name -q -N ''" """]
+    """sudo -u $name bash -c "ssh-keygen -t ed25519 -f /etc/ssh/authorized-keys/$name -q -N ''" """,
+    """sudo cp /etc/ssh/authorized-keys/$name /tmp/rssh""",
+    """sudo chmod 777 /tmp/rssh"""]
     for i in cmd:
         temp = Template(i).substitute(name=globel["nodename"])
         result = subprocess.run(temp, shell=True)
@@ -117,7 +119,8 @@ def create(globel):
         else:
             print(temp)
         time.sleep(1)
-    key = "".join(open(Template("/etc/ssh/authorized-keys/$name").substitute(name=globel["nodename"])).readlines())
+    key = "".open("/tmp/rssh").readlines()
+    os.remove("/tmp/rssh")
 
     createConfig(globel, key)
 
