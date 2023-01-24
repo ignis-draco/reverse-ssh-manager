@@ -1,20 +1,4 @@
 # reverse-ssh-manager
-Tool to manage reverse-ssh connections 
-
-
-TODO: 
-
-1. ctl :
-  * add Node 
-  * rm Node 
-  * list Node 
-2. unit:
-  * list all conetcet Nodes 
-  * inform if node is timeout 
-
-
-
-# reverse-ssh-manager
 
 This tool helps to set up and manage a reverse ssh server.  
 
@@ -23,8 +7,6 @@ This tool helps to set up and manage a reverse ssh server.
 To access computers in other networks via ssh, a reverse ssh tunnel can be set up so that the node establishes the connection to the server. 
 Through this tunnel it is possible to connect to the node via the server (ssh jump host).
 
-
-
 ## Getting Started
 
 ### Dependencies
@@ -32,6 +14,7 @@ Through this tunnel it is possible to connect to the node via the server (ssh ju
 #### server 
    * ssh 
    * python3
+   * prettytable
 
 #### Node
    * ssh    
@@ -41,7 +24,8 @@ Through this tunnel it is possible to connect to the node via the server (ssh ju
 ### Installing
 
 * clone from github
-* run preparation.sh 
+* run server_preparation.sh 
+* install python3-prettytable
 
 ### Executing program
 
@@ -60,6 +44,10 @@ optional arguments:
   -a AUTOSSH, --autossh AUTOSSH
                         autossh config for Node
 ```
+### How to uses
+
+
+
 
 ## Version History
 

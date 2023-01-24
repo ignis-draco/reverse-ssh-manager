@@ -57,8 +57,3 @@ sudo systemctl daemon-reload
 ##6) enable and start unit 
 sudo systemctl start autossh_$name.service
 sudo systemctl enable autossh_$name.service
-
-
-
-
-
