@@ -105,7 +105,7 @@ def create(globel):
         print("name already in use")
         return
     
-    cmd = ["useradd --no-create-home -g remoteNodes -s /sbin/nologin --system $name",
+    cmd = ["sudo useradd --no-create-home -g remoteNodes -s /sbin/nologin --system $name",
     """ sudo -u $name bash -c "ssh-keygen -t ecdsa -b 256 -f /etc/ssh/authorized-keys/$name -q -N ''" """]
     for i in cmd:
         temp = Template(i).substitute(name=globel["nodename"])
