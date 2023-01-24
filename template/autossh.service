@@ -1,0 +1,18 @@
+[Unit]
+Description=autossh
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=autossh
+Environment="AUTOSSH_GATETIME=0"
+ExecStart=/usr/bin/autossh -M 0 \
+                           -o "ServerAliveInterval 30" \
+                           -o "ServerAliveCountMax 3" \
+                           -i /home/autossh/.ssh/$name \
+                           -NR $port:localhost:22 $name@192.168.10.21 \
+                           -p 22
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
