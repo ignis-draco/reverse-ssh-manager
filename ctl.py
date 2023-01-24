@@ -13,17 +13,15 @@ import tarfile
 
 ##Parameter 
 
-
 parser = argparse.ArgumentParser()
-
 parser.add_argument("--list", help="List all configure Nodes",  action="store_true")
 parser.add_argument("-c", "--create", metavar="Nodename", help="create a new Node")
 parser.add_argument("-r", "--remove", metavar="Nodename", help="remove a Node")
 parser.add_argument("-a", "--autossh", metavar="Nodename", help="autossh config for Node")
-
 args = parser.parse_args()
 
 ##Files & Config
+
 ## for configfile 
 PORT = "port"
 NODENAME = "nodename"
@@ -33,6 +31,17 @@ KEY = "key"
 ## for intern uses 
 CONNECTED = "connected"
 LASTCONNECTED = "lastConnected"
+
+## File Path
+PATHCONFIG="nodes"
+if (not os.path.isdir(PATHCONFIG)):
+    os.mkdir(PATHCONFIG)
+
+PATHINSTALL = "node_install"
+if(not os.path.isdir(PATHINSTALL)):
+    os.mkdir(PATHINSTALL)
+
+PATHTEMPLATE="template"
 
 
 def readConfig(filepath):
@@ -47,12 +56,9 @@ def createConfig(globel, key):
     config = configparser.ConfigParser()
     config["Global"] = globel
     config["Key"] = {KEY:key}
-    config.write(open(os.path.join(PATH, globel[NODENAME]+".conf"),"w"))
+    config.write(open(os.path.join(PATHCONFIG, globel[NODENAME]+".conf"),"w"))
 ##Files 
 
-PATHCONFIG="nodes"
-if (not os.path.isdir(PATHCONFIG)):
-    os.mkdir(PATHCONFIG)
 
 NodeList = []
 
@@ -61,25 +67,24 @@ fileList = glob.glob(PATHCONFIG + "/*.conf")
 for i in fileList:
     NodeList.append(readConfig(i))    
 
-PATHINSTALL = "node_install"
 
-if(not os.path.isdir(PATHINSTALL)):
-    os.mkdir(PATHINSTALL)
-
-PATHTEMPLATE="template"
+config = configparser.ConfigParser()
+config.read("ServerConfig.conf")
+ServerConfig = {}
+for i in config.sections():
+    ServerConfig.update(dict(config.items(i)))
 
 
 ## functions 
 
 def nextFreePort():
     if len(NodeList) == 0:
-        return 10010
+        return ServerConfig["startPort"]
     portlist = []
     for i in NodeList:
         portlist.append(i[PORT])
     print(portlist)
     return int(sorted(portlist)[-1]) + 1
-
 
 def existNode(nodename):
     for i in NodeList:
@@ -199,7 +204,10 @@ def createInstall(nodename):
     installTemp =  Template(open(os.path.join(PATHTEMPLATE,"client_install.sh")).read())
     
     
-    service = servicesTemp.substitute(name=nodeConfig[NODENAME], port=nodeConfig[PORT])
+    service = servicesTemp.substitute(name=nodeConfig[NODENAME], port=nodeConfig[PORT],
+                                      server=ServerConfig["server"],
+                                      serverSSHPort=ServerConfig["serverSSHPort"] )
+
     with open(os.path.join(path, "autossh_"+nodeConfig[NODENAME]+".service" ),"w") as f:
         f.write(service)
     
@@ -219,7 +227,6 @@ def createInstall(nodename):
             tar.add(os.path.join(path,name),arcname=name )
     
     #8) [optional] create text file for std copy 
-
     with open( os.path.join(PATHINSTALL, nodename + ".copy"), "w") as f:
         f.write("echo $'" + service + "' > " + "autossh_"+nodeConfig[NODENAME]+".service\n")
         f.write("echo $'" + install + "' > " + "client_install.sh\n")
@@ -232,12 +239,11 @@ if (args.list):
     #TODO: Check connection state
     printnodes(NodeList)
 elif (args.create):
-    #TODO: opt. parameter Port, timeout     
+    #TODO: opt. parameter timeout     
     create({NODENAME:args.create, PORT:nextFreePort(), TIMEOUT:5000})
 elif(args.remove):
     remove(args.remove)
 elif(args.autossh):
     createInstall(args.autossh)
-    print("auto ssh config")
 else: 
     print("no cmd")
