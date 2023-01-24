@@ -15,10 +15,12 @@ Through this tunnel it is possible to connect to the node via the server (ssh ju
    * ssh 
    * python3
    * prettytable
+   * sudo 
 
 #### Node
    * ssh    
    * autossh
+   * sudo 
 
 
 ### Installing
@@ -44,9 +46,52 @@ optional arguments:
   -a AUTOSSH, --autossh AUTOSSH
                         autossh config for Node
 ```
-### How to uses
+## How to uses
+### Create new Node
+Create a new Node with the name "ambrosia".
 
+1. create Node. 
+```
+python3 ctl.py -c ambrosia
+python3 ctl.py -a ambrosia
+```
+2. copy node_install/ambrosia.tar.gz to Node
+   -  **or** copy the node_install/ambrosia.copy to clipboard and paste is in cmd on Node 
+3. run on Node 
+```
+/bin/bash  client_install.sh
+```
+### list all nodes
+```
+python3 ctl.py --list
++----------+-------+--------------+------------------+
+| nodename |  port |  connected   |  last connected  |
++----------+-------+--------------+------------------+
+| ambrosia | 10011 | i[CONNECTED] | i[LASTCONNECTED] |
+| test1    | 10012 | i[CONNECTED] | i[LASTCONNECTED] |
+| test2    | 10013 | i[CONNECTED] | i[LASTCONNECTED] |
++----------+-------+--------------+------------------+
+```
+### Establish connection to the node
+#### First option
+on server: 
+```
+ssh <node user>@localhost -p <node port>
+```
+#### Second option
 
+Edit ~/.ssh/config on your pc
+```
+Host rSSHserver
+  HostName <server IP>
+  User <User on server>
+
+Host Ambrosia
+  HostName localhost 
+  ProxyJump rSSHserver
+  Port 10011 # node port
+  User <node User>
+```
 
 
 ## Version History
