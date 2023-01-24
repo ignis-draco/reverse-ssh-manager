@@ -119,9 +119,13 @@ def create(globel):
         else:
             print(temp)
         time.sleep(1)
-    key = "".open("/tmp/rssh").readlines()
-    os.remove("/tmp/rssh")
-
+    key = "".join(open("/tmp/rssh").readlines())
+    
+    result = subprocess.run("sudo rm /tmp/rssh", shell=True)
+    if result.returncode != 0:
+        print("something went wrong")
+        return
+        
     createConfig(globel, key)
 
 
