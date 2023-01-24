@@ -79,7 +79,7 @@ for i in config.sections():
 
 def nextFreePort():
     if len(NodeList) == 0:
-        return ServerConfig["startPort"]
+        return ServerConfig["startport"]
     portlist = []
     for i in NodeList:
         portlist.append(i[PORT])
@@ -206,7 +206,7 @@ def createInstall(nodename):
     
     service = servicesTemp.substitute(name=nodeConfig[NODENAME], port=nodeConfig[PORT],
                                       server=ServerConfig["server"],
-                                      serverSSHPort=ServerConfig["serverSSHPort"] )
+                                      serverSSHPort=ServerConfig["serversshport"] )
 
     with open(os.path.join(path, "autossh_"+nodeConfig[NODENAME]+".service" ),"w") as f:
         f.write(service)
