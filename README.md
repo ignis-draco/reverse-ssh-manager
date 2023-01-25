@@ -51,7 +51,7 @@ optional arguments:
 Create a new Node with the name "ambrosia".
 
 1. create Node. 
-```
+```bash
 python3 ctl.py -c ambrosia
 python3 ctl.py -a ambrosia
 ```
@@ -73,10 +73,14 @@ python3 ctl.py --list
 +----------+-------+--------------+------------------+
 ```
 ### Establish connection to the node
+
+Connect to the computer "ambrosia" with the user "pi" 
+
 #### First option
 on server: 
-```
-ssh <node user>@localhost -p <node port>
+```bash
+#  ssh <node user>@localhost -p <node port>
+ssh pi@localhost -p 10011
 ```
 #### Second option
 
@@ -90,7 +94,7 @@ Host Ambrosia
   HostName localhost 
   ProxyJump rSSHserver
   Port 10011 # node port
-  User <node User>
+  User pi
 ```
 
 
