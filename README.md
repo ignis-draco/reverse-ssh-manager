@@ -3,8 +3,10 @@
 This tool helps to set up and manage a reverse ssh server.  
 
 ## Description
+<img src="./struct.drawio.svg">
 
 To access computers in other networks via ssh, a reverse ssh tunnel can be set up so that the node establishes the connection to the server. 
+
 Through this tunnel it is possible to connect to the node via the server (ssh jump host).
 
 ## Getting Started
