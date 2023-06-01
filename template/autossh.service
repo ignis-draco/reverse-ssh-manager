@@ -13,6 +13,7 @@ ExecStart=/usr/bin/autossh -M 0 \
                            -NR $port:localhost:22 $name@$server \
                            -p $serverSSHPort
 Restart=always
+RestartSec=10min
 
 [Install]
 WantedBy=multi-user.target

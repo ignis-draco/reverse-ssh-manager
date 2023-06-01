@@ -22,13 +22,13 @@ args = parser.parse_args()
 
 ##Files & Config
 
-## for configfile 
+## for configfile
 PORT = "port"
 NODENAME = "nodename"
 TIMEOUT = "timeout"
-KEY = "key" 
+KEY = "key"
 
-## for intern uses 
+## for intern uses
 CONNECTED = "connected"
 LASTCONNECTED = "lastConnected"
 
@@ -51,13 +51,13 @@ def readConfig(filepath):
     for i in config.sections():
         values.update(dict(config.items(i)))
     return values
-    
+
 def createConfig(globel, key):
     config = configparser.ConfigParser()
     config["Global"] = globel
     config["Key"] = {KEY:key}
     config.write(open(os.path.join(PATHCONFIG, globel[NODENAME]+".conf"),"w"))
-##Files 
+##Files
 
 
 NodeList = []
@@ -65,7 +65,7 @@ NodeList = []
 fileList = glob.glob(PATHCONFIG + "/*.conf")
 
 for i in fileList:
-    NodeList.append(readConfig(i))    
+    NodeList.append(readConfig(i))
 
 
 config = configparser.ConfigParser()
@@ -75,7 +75,7 @@ for i in config.sections():
     ServerConfig.update(dict(config.items(i)))
 
 
-## functions 
+## functions
 
 def nextFreePort():
     if len(NodeList) == 0:
@@ -104,7 +104,7 @@ def create(globel):
     if(existNode(globel[NODENAME])):
         print("name already in use")
         return
-    
+
     cmd = ["sudo useradd --no-create-home -g remoteNodes -s /sbin/nologin --system $name",
     """sudo -u $name bash -c "ssh-keygen -t ed25519 -f /etc/ssh/authorized-keys/$name -q -N ''" """,
     """sudo cp /etc/ssh/authorized-keys/$name /tmp/rssh""",
@@ -120,12 +120,12 @@ def create(globel):
             print(temp)
         time.sleep(1)
     key = "".join(open("/tmp/rssh").readlines())
-    
+
     result = subprocess.run("sudo rm /tmp/rssh", shell=True)
     if result.returncode != 0:
         print("something went wrong")
         return
-        
+
     createConfig(globel, key)
 
 
@@ -139,7 +139,7 @@ def remove(nodename):
     if (len(file) == 0):
         print("No node config file found")
         return
-    cmd = ["deluser $name", "rm /etc/ssh/authorized-keys/$name*"]
+    cmd = ["sudo deluser $name", "sudo rm /etc/ssh/authorized-keys/$name*"]
 
     for i in cmd:
         temp = Template(i).substitute(name=nodename)
@@ -149,12 +149,11 @@ def remove(nodename):
             print("something went wrong")
             return
 
-    result = subprocess.run("rm "+ file, shell=True)
+    result = subprocess.run("sudo rm "+ file, shell=True)
     if result.returncode != 0:
         print("something went wrong")
         return
-        
-    
+
 
 def printnodes(NodeList):
     tb = PrettyTable()
@@ -163,7 +162,7 @@ def printnodes(NodeList):
     for i in NodeList:
         tb.add_row([i[NODENAME], i[PORT], "i[CONNECTED]", "i[LASTCONNECTED]" ])
 
-    print(tb)    
+    print(tb)
 
 
 def createInstall(nodename):
@@ -171,41 +170,29 @@ def createInstall(nodename):
     #1) check config
     if(not existNode(nodename)):
         print("nodename not exists")
-        return 
+        return
 
-    #1.1) check if nodename is pressend    
+    #1.1) check if nodename is pressend
     path = os.path.join(PATHINSTALL,nodename)
-    
+
     if(os.path.isdir(path)):
         shutil.rmtree(path)
-    
+
     if(os.path.exists(os.path.join(PATHINSTALL, nodename + ".tar.gz") )):
         os.remove(os.path.join(PATHINSTALL, nodename + ".tar.gz"))
-    
+
     #2) create dir in /node_install/<Nodename>
     os.mkdir(path)
-    
+
     #3) get host key (Known_keys) > in folder
-    find_key = False
-    hostkey = ""
-    testcnt = 0
-    while(not find_key): 
-        o = subprocess.run("ssh-keyscan -H localhost", shell=True, capture_output=True, text=True)    
-        testcnt += 1
-        if (len(o.stdout) != 0):
-            hostkey = o.stdout
-            find_key = True
-        if(testcnt > 100):
-            print("not server key fingerprint!")
-            return 
-    
-    
+    hostkey = ServerConfig["knownhosts"]   
+
     f = open(os.path.join(path, "known_hosts"),"w")
     f.write(hostkey)
     f.close()
-    
+
     nodeConfig = getNodeConfig(nodename)    
-    
+
     #4) use autossh.service template > autossh_<Nodename>.service
     servicesTemp = Template( open( os.path.join(PATHTEMPLATE,"autossh.service" )).read())
     installTemp =  Template(open(os.path.join(PATHTEMPLATE,"client_install.sh")).read())
@@ -238,7 +225,7 @@ def createInstall(nodename):
         f.write("echo $'" + service + "' > " + "autossh_"+nodeConfig[NODENAME]+".service\n")
         f.write("echo $'" + install + "' > " + "client_install.sh\n")
         f.write("echo $'" + nodeConfig[KEY] +"' > " + nodeConfig[NODENAME] + "\n")
-
+        f.write("echo $'" + hostkey + "' > " + "known_hosts" + "\n")
                
 
 

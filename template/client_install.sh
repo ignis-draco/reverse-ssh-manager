@@ -22,14 +22,14 @@ sudo apt-get install autossh
 
 ##0) check if alle Files are pressend
 
-if test -f "$name"; then 
+if [ ! -f "$name" ]; then 
 	echo "key file not pressend"
-	return -1
+	exit -1
 fi 
 
-if test -f "known_hosts"; then 
+if [ ! -f "known_hosts" ]; then 
 	echo "known_hosts file not pressend"
-	return -1
+	exit -1
 fi 
 
 
@@ -46,7 +46,7 @@ sudo chown -R autossh:autossh /home/autossh/.ssh
 
 sudo chmod 700 /home/autossh/.ssh
 sudo chmod 600 /home/autossh/.ssh/$name
-suod cmod 644 /home/autossh/known_hosts
+sudo chmod 644 /home/autossh/.ssh/known_hosts
 
 
 ##5) copy systemd unit 
