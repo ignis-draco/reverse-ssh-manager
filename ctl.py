@@ -11,7 +11,7 @@ from prettytable import PrettyTable
 import shutil
 import tarfile
 
-##Parameter 
+##Parameter
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--list", help="List all configure Nodes",  action="store_true")
@@ -185,59 +185,59 @@ def createInstall(nodename):
     os.mkdir(path)
 
     #3) get host key (Known_keys) > in folder
-    hostkey = ServerConfig["knownhosts"]   
+    hostkey = ServerConfig["knownhosts"]
 
     f = open(os.path.join(path, "known_hosts"),"w")
     f.write(hostkey)
     f.close()
 
-    nodeConfig = getNodeConfig(nodename)    
+    nodeConfig = getNodeConfig(nodename)
 
     #4) use autossh.service template > autossh_<Nodename>.service
     servicesTemp = Template( open( os.path.join(PATHTEMPLATE,"autossh.service" )).read())
     installTemp =  Template(open(os.path.join(PATHTEMPLATE,"client_install.sh")).read())
-    
-    
+
+
     service = servicesTemp.substitute(name=nodeConfig[NODENAME], port=nodeConfig[PORT],
                                       server=ServerConfig["server"],
                                       serverSSHPort=ServerConfig["serversshport"] )
 
     with open(os.path.join(path, "autossh_"+nodeConfig[NODENAME]+".service" ),"w") as f:
         f.write(service)
-    
-    #5) user client_install.sh template > autossh 
+
+    #5) user client_install.sh template > autossh
     install = installTemp.safe_substitute(name=nodeConfig[NODENAME])
     with open(os.path.join(path, "client_install.sh"),"w") as f:
         f.write(install)
 
-    #6) copy private key 
+    #6) copy private key
     with open(os.path.join(path, nodeConfig[NODENAME]),"w") as f:
         f.write(nodeConfig[KEY])
 
-    #7) tar.gz alles 
+    #7) tar.gz alles
     files = os.listdir(path)
     with tarfile.open(os.path.join(PATHINSTALL, nodename + ".tar.gz"), "w:gz") as tar:
         for name in files:
             tar.add(os.path.join(path,name),arcname=name )
-    
-    #8) [optional] create text file for std copy 
+
+    #8) [optional] create text file for std copy
     with open( os.path.join(PATHINSTALL, nodename + ".copy"), "w") as f:
         f.write("echo $'" + service + "' > " + "autossh_"+nodeConfig[NODENAME]+".service\n")
         f.write("echo $'" + install + "' > " + "client_install.sh\n")
         f.write("echo $'" + nodeConfig[KEY] +"' > " + nodeConfig[NODENAME] + "\n")
         f.write("echo $'" + hostkey + "' > " + "known_hosts" + "\n")
-               
+
 
 
 if (args.list):
     #TODO: Check connection state
     printnodes(NodeList)
 elif (args.create):
-    #TODO: opt. parameter timeout     
+    #TODO: opt. parameter timeout
     create({NODENAME:args.create, PORT:nextFreePort(), TIMEOUT:5000})
 elif(args.remove):
     remove(args.remove)
 elif(args.autossh):
     createInstall(args.autossh)
-else: 
+else:
     print("no cmd")
