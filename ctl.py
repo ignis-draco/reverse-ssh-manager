@@ -224,9 +224,9 @@ def createInstall(nodename):
 
     #8) [optional] create text file for std copy
     with open( os.path.join(PATHINSTALL, nodename + ".copy"), "w") as f:
-        f.write("echo $'" + service + "' > " + "autossh_"+nodeConfig[NODENAME]+".service\n")
-        f.write("echo $'" + install + "' > " + "client_install.sh\n")
-        f.write("echo $'" + nodeConfig[KEY] +"' > " + nodeConfig[NODENAME] + "\n")
+        f.write("echo $'" + service + "' > " + "autossh_"+nodeConfig[NODENAME]+".service\n\n\n")
+        f.write("echo $'" + install + "' > " + "client_install.sh\n\n\n")
+        f.write("echo $'" + nodeConfig[KEY] +"' > " + nodeConfig[NODENAME] + "\n\n\n")
         f.write("echo $'" + hostkey + "' > " + "known_hosts" + "\n")
 
 
