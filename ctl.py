@@ -77,6 +77,14 @@ for i in config.sections():
 
 ## functions
 
+def getInfosFromNode():
+    portsList = subprocess.check_output("ss -tl4",universal_newlines=True, shell=True)
+    for i in NodeList:
+        if  portsList.find(i[PORT]) != -1 :
+            i[CONNECTED] = True
+        else:
+            i[CONNECTED] = False
+
 def nextFreePort():
     if len(NodeList) == 0:
         return ServerConfig["startport"]
@@ -98,7 +106,13 @@ def getNodeConfig(nodename):
             return i
     return None
 
-
+def printnodes(NodeList):
+    tb = PrettyTable()
+    #TODO: Sort name oder port
+    tb.field_names = [NODENAME, PORT, CONNECTED, "last connected"]
+    for i in NodeList:
+        tb.add_row([i[NODENAME], i[PORT], i[CONNECTED], "i[LASTCONNECTED]" ])
+    print(tb)
 
 def create(globel):
     if(existNode(globel[NODENAME])):
@@ -128,7 +142,6 @@ def create(globel):
 
     createConfig(globel, key)
 
-
 def remove(nodename):
     if(not existNode(nodename)):
         print("nodename not exists")
@@ -153,17 +166,6 @@ def remove(nodename):
     if result.returncode != 0:
         print("something went wrong")
         return
-
-
-def printnodes(NodeList):
-    tb = PrettyTable()
-    #TODO: Sort name oder port
-    tb.field_names = [NODENAME, PORT, CONNECTED, "last connected"]
-    for i in NodeList:
-        tb.add_row([i[NODENAME], i[PORT], "i[CONNECTED]", "i[LASTCONNECTED]" ])
-
-    print(tb)
-
 
 def createInstall(nodename):
 
@@ -194,7 +196,7 @@ def createInstall(nodename):
     nodeConfig = getNodeConfig(nodename)
 
     #4) use autossh.service template > autossh_<Nodename>.service
-    servicesTemp = Template( open( os.path.join(PATHTEMPLATE,"autossh.service" )).read())
+    servicesTemp = Template(open( os.path.join(PATHTEMPLATE,"autossh.service" )).read())
     installTemp =  Template(open(os.path.join(PATHTEMPLATE,"client_install.sh")).read())
 
 
@@ -230,7 +232,7 @@ def createInstall(nodename):
 
 
 if (args.list):
-    #TODO: Check connection state
+    getInfosFromNode()
     printnodes(NodeList)
 elif (args.create):
     #TODO: opt. parameter timeout
