@@ -244,10 +244,10 @@ def createSSHConfig(nodename, username):
     nodeConfig = getNodeConfig(nodename)
 
     sshConfTemp = Template(open( os.path.join(PATHTEMPLATE,"ssh_config" )).read())
-    sshConfTemp.substitute(user=username, port=nodeConfig[PORT], name=nodeConfig[NODENAME] )
+    sshConf = sshConfTemp.substitute(user=username, port=nodeConfig[PORT], name=nodeConfig[NODENAME] )
 
     with open(os.path.join(path, nodeConfig[NODENAME] ),"w") as f:
-        f.write(sshConfTemp)
+        f.write(sshConf)
 
 
 
