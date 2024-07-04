@@ -236,12 +236,16 @@ def createSSHConfig(nodename, username):
         print("nodename not exists")
         return
 
+
+    path = os.path.join(PATHINSTALL,"ssh_config")
+    if (not os.path.isdir(path)):
+        os.mkdir(path)
+
     nodeConfig = getNodeConfig(nodename)
 
     sshConfTemp = Template(open( os.path.join(PATHTEMPLATE,"ssh_config" )).read())
     sshConfTemp.substitute(user=username, port=nodeConfig[PORT], name=nodeConfig[NODENAME] )
 
-    path = os.path.join(PATHINSTALL,"ssh_config")
     with open(os.path.join(path, nodeConfig[NODENAME] ),"w") as f:
         f.write(sshConfTemp)
 
