@@ -18,6 +18,7 @@ parser.add_argument("--list", help="List all configure Nodes",  action="store_tr
 parser.add_argument("-c", "--create", metavar="Nodename", help="create a new Node")
 parser.add_argument("-r", "--remove", metavar="Nodename", help="remove a Node")
 parser.add_argument("-a", "--autossh", metavar="Nodename", help="autossh config for Node")
+parser.add_argument("-s", "--sshconf", nargs=2, metavar=("Nodename", "User"), help="ssh config for Source")
 args = parser.parse_args()
 
 ##Files & Config
@@ -229,6 +230,21 @@ def createInstall(nodename):
         f.write("echo $'" + nodeConfig[KEY] +"' > " + nodeConfig[NODENAME] + "\n\n\n")
         f.write("echo $'" + hostkey + "' > " + "known_hosts" + "\n")
 
+def createSSHConfig(nodename, username):
+    #1) check config
+    if(not existNode(nodename)):
+        print("nodename not exists")
+        return
+
+    nodeConfig = getNodeConfig(nodename)
+
+    sshConfTemp = Template(open( os.path.join(PATHTEMPLATE,"ssh_config" )).read())
+    sshConfTemp.substitute(user=username, port=nodeConfig[PORT], name=nodeConfig[NODENAME] )
+
+    path = os.path.join(PATHINSTALL,"ssh_config")
+    with open(os.path.join(path, nodeConfig[NODENAME] ),"w") as f:
+        f.write(sshConfTemp)
+
 
 
 if (args.list):
@@ -241,5 +257,7 @@ elif(args.remove):
     remove(args.remove)
 elif(args.autossh):
     createInstall(args.autossh)
+elif(args.sshconf):
+    createSSHConfig(args.sshconf[0],args.sshconf[1])
 else:
     print("no cmd")
