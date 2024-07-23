@@ -10,6 +10,7 @@ import configparser
 from prettytable import PrettyTable
 import shutil
 import tarfile
+from operator import itemgetter
 
 ##Parameter
 
@@ -110,8 +111,10 @@ def getNodeConfig(nodename):
 def printnodes(NodeList):
     tb = PrettyTable()
     #TODO: Sort name oder port
+    newlist = sorted(NodeList, key=itemgetter(NODENAME))
+    
     tb.field_names = [NODENAME, PORT, CONNECTED, "last connected"]
-    for i in NodeList:
+    for i in newlist:
         tb.add_row([i[NODENAME], i[PORT], i[CONNECTED], "i[LASTCONNECTED]" ])
     print(tb)
 
